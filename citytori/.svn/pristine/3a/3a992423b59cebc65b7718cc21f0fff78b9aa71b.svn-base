@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>test</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript">
+        function sendData() {
+            var n=document.forms["productForm"].elements["product"].value;
+            var p=document.forms["productForm"].elements["price"].value;
+            var d="<product><name>"+n+"</name><price>"+p+"</price></product>";
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "./rest/product");
+            xhr.setRequestHeader("Content-Type","application/xml");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState===4 && xhr.status===200) {
+                    var n = xhr.responseXML.getElementsByTagName("name").item(0).firstChild.nodeValue;
+                    var v = xhr.responseXML.getElementsByTagName("price").item(0).firstChild.nodeValue;
+                    document.getElementById("result01").innerHTML = "name="+n+", price="+v;
+                }
+            };
+            xhr.send(d);
+        }
+        </script>
+    </head>
+    <body>
+        <form action="#" name="productForm">
+            <p> Product: <input type="text" size="30" name="product"/>
+                Price:   <input type="text" size="30" name="price" />
+            </p>
+            <p><input type="button" value="Register" onclick="sendData()"></p>
+            <p id="result01">No result</p>
+        </form>
+    </body>
+</html>

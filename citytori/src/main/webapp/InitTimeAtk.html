@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <title>test</title>
+    <script type="text/javascript">
+    function sendData(){
+      var id  = document.forms["productForm"].elements["userId"].value;
+      var data = { userId: id };
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST','./rest/InitTimeAtk');
+      xhr.onreadystatechange = processResponse;
+      xhr.setRequestHeader('Content-Type','application/json');
+      var json_data = JSON.stringify(data);
+      xhr.send(json_data);
+      function processResponse() {
+        if (xhr.readyState===4 && xhr.status===200) {
+            var data = JSON.parse(xhr.responseText);
+            document.getElementById("result01").innerHTML = "theme" + data.theme;
+        }
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <form action="#" name="productForm">
+      <p>
+        UserID: <input type="text" size="30" name="userId">
+      </p>
+      <p><input type="button" value="Register" onclick="sendData()"></p>
+      <p id="result01">No result</p>
+    </form>
+  </body>
+</html>
+
+

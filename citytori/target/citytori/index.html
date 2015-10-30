@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>test</title>
+    <script type="text/javascript">
+    function sendData(){
+      var n  = document.forms["productForm"].elements["product"].value;
+      var p = document.forms["productForm"].elements["price"].value;
+      var data = { name: n, price: parseFloat(p) };
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST','./rest/product');
+      xhr.onreadystatechange = processResponse;
+      xhr.setRequestHeader('Content-Type','application/json');
+      var json_data = JSON.stringify(data);
+      xhr.send(json_data);
+      function processResponse() {
+        if (xhr.readyState===4 && xhr.status===200) {
+            var data = JSON.parse(xhr.responseText);
+            document.getElementById("result01").innerHTML = "name="+data.name+", price="+data.price;
+        }
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <form action="#" name="productForm">
+      <p>
+        Product: <input type="text" size="30" name="product">
+        Price: <input type="text" size="30" name="price">
+      </p>
+      <p><input type="button" value="Register" onclick="sendData()"></p>
+      <p id="result01">No result</p>
+    </form>
+  </body>
+</html>
+
+
