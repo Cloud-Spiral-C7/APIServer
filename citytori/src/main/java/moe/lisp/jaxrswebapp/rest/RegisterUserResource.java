@@ -2,6 +2,7 @@ package moe.lisp.jaxrswebapp.rest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -9,6 +10,7 @@ import moe.lisp.jaxrswebapp.controller.DBController;
 import moe.lisp.jaxrswebapp.entity.QueryUserInfoBase;
 import moe.lisp.jaxrswebapp.entity.QueryUserName;
 
+@Path("RegisterUser")
 public class RegisterUserResource {
 
 	DBController controller = new DBController();
