@@ -7,7 +7,7 @@
       var id  = document.forms["productForm"].elements["userId"].value;
       var data = { userId: id };
       var xhr = new XMLHttpRequest();
-      xhr.open('POST','./api/InitTimeAtk');
+      xhr.open('POST','./rest/InitTimeAtk');
       xhr.onreadystatechange = processResponse;
       xhr.setRequestHeader('Content-Type','application/json');
       var json_data = JSON.stringify(data);

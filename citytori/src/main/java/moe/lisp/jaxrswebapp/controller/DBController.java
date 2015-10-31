@@ -8,13 +8,14 @@ import javax.ejb.Init;
 import javax.json.JsonObject;
 
 import org.bson.types.ObjectId;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 import moe.lisp.jaxrswebapp.entity.Answer;
 import moe.lisp.jaxrswebapp.entity.Area;
 import moe.lisp.jaxrswebapp.entity.Ranking;
+import moe.lisp.jaxrswebapp.entity.ResponseRanking;
 import moe.lisp.jaxrswebapp.entity.Room;
 import moe.lisp.jaxrswebapp.entity.User;
+import moe.lisp.jaxrswebapp.entity.Rank;
 import moe.lisp.jaxrswebapp.util.CSVUtils;
 import moe.lisp.jaxrswebapp.util.DBUtils;
 
@@ -52,24 +53,6 @@ public class DBController {
 	}
 
 	//---------------------usersコレクション-------------------------
-	public String getUserId(String userName){
-		DBObject query = new BasicDBObject();
-		query.put("name", userName);
-		DBObject result = usersCollection.findOne(query);
-		ObjectId id = (ObjectId)result.get("_id");
-		String userId = id.toString();
-
-		return userId;
-
-	}
-
-	public void setUserName(String userName){
-		DBObject query = new BasicDBObject();
-		query.put("name", userName);
-		query.put("roomId" , "0");
-		usersCollection.insert(query);
-	}
-
 	public String getRoomId(String userId){
 		DBObject query = new BasicDBObject();
 		query.put("_id", new ObjectId(userId));
@@ -79,6 +62,18 @@ public class DBController {
 
 		return roomId;
 	}
+
+	public String getUserName(String userId){
+		DBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(userId));
+		DBObject result = usersCollection.findOne(query);
+		String userName = (String)result.get("name");
+		System.out.println("Request to get userId:" + userId +",userName:" + userName);
+
+		return userName;
+	}
+
+
 	//-----------------------------------------------------------
 
 	//---------------------roomsコレクション-------------------------
@@ -188,6 +183,32 @@ public class DBController {
 		query.put("name", name);
 		query.put("score", score);
 		rankingCollection.insert(query);
+	}
+
+	public ArrayList<Rank> getRanking(String gameMode){
+
+		ArrayList<Rank> ranking = new ArrayList<Rank>();
+
+		DBObject query = new BasicDBObject();
+		query.put("gameMode", gameMode);
+		DBCursor cursor = rankingCollection.find(query);
+		DBObject orderBy = new BasicDBObject();
+		orderBy.put("score",1);
+		cursor.sort(orderBy);
+		cursor.limit(10);
+		for(DBObject o: cursor){
+			Rank rank = new Rank();
+			rank.setName((String) o.get("name"));
+			rank.setScore((String) o.get("score"));
+//			System.out.println("name:"+rank.getName());
+//			System.out.println("score:"+rank.getScore());
+			ranking.add(rank);
+		}
+		for(int i=0;i<ranking.size();i++){
+		System.out.println(ranking.get(i).getName());
+		System.out.println(ranking.get(i).getScore());
+		}
+		return ranking;
 	}
 	//-----------------------------------------------------------
 

@@ -4,11 +4,13 @@ public class DBInitializer {
 
 	public static void main(String args[]){
 		DBController controller = new DBController();
+//		controller.setRanking(controller.getGameMode("5633128d4de93496d452bf61") ,  controller.getUserName("5633128d4de93496d452bf61"), "1");
+		controller.getRanking(controller.getGameMode("5633128d4de93496d452bf61"));
 //		controller.initializeAll();
 		//controller.getWordNum("562dbad4922caacefbfbc77c");
 //		controller.setStatus("562dbad4922caacefbfbc77c" , DBController.ROOM_STATUS_CREATE);
-		controller.initializeAnswers();
-		controller.setCurrentWord("56305fb8922c1e1f04c9ca10" , "わ");
+		//controller.initializeAnswers();
+		//controller.setCurrentWord("56305fb8922c1e1f04c9ca10" , "わ");
 
 
 //		String phonetic = "さっぽろ";
