@@ -4,13 +4,11 @@ C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\rest\JaxrsActivator
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\entity\ResponseJudgement.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\rest\JudgeAnswerResource.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\controller\DBController.java
-C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\rest\NazoObj.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\controller\DBInitializer.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\rest\UpdateTimeAttackRanking.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\entity\Rank.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\entity\ResponseRanking.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\entity\Answer.java
-C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\rest\SampleResponse.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\entity\Room.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\util\DBUtils.java
 C:\pbl\workspace\citytori\src\main\java\moe\lisp\jaxrswebapp\entity\QueryAnswer.java
