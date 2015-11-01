@@ -6,6 +6,7 @@ import javassist.compiler.ast.NewExpr;
 
 import javax.ejb.Init;
 import javax.json.JsonObject;
+import javax.sound.midi.ControllerEventListener;
 
 import org.bson.types.ObjectId;
 
@@ -212,6 +213,31 @@ public class DBController {
 	}
 	//-----------------------------------------------------------
 
+	//-------------------複数コレクション---------------------------
+
+	public Object CloseSingleGame(String userId,String roomId) {
+
+		//roomsコレクションから削除
+		DBObject roomQuery = new BasicDBObject();
+		roomQuery.put("_id",new ObjectId(roomId));
+		DBObject room = roomsCollection.findOne(roomQuery);
+		System.out.println(room);
+		roomsCollection.remove(room);
+
+		//answerコレクションから削除
+		DBCursor answers = answersCollection.find(roomQuery);
+		for(DBObject o : answers){
+			answersCollection.remove(o);
+		}
+
+		//該当userデータのroomIdをnullに変更
+		DBObject userQuery = new BasicDBObject();
+		userQuery.put("_id", new ObjectId(userId));
+		DBObject user = usersCollection.findOne(userQuery);
+		user.put("roomId", null);
+		usersCollection.save(user);
+		return null;
+	}
 	//---------------------Initializer-------------------------
 	public void initializeAll(){
 		initializeRooms();
@@ -304,5 +330,7 @@ public class DBController {
 		}
 	}
 	//-----------------------------------------------------------
+
+
 
 }
