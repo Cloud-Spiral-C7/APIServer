@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>tinychat</title>
+</head>
+
+<body>
+	<input id="rest" type="button" value="REST API呼び出しテスト"/>
+	<p id="count"></p>
+	<br>
+
+	<input id="connect" type="button" value="チャットに参加（WebSocket）"/>
+	<form id="send">
+		<input type="text" id="uid" />
+		<input type="text" id="body" required/>
+		<input type="submit" value="送信"/>
+	</form>
+	<table id="log">
+	</table>
+
+	<script src="js/jquery-2.1.4.js"></script>
+	<script src="js/tinychat.js"></script>
+</body>
+
+</html>
