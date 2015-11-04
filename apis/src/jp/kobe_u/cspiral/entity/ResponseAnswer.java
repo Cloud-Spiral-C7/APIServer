@@ -24,7 +24,7 @@ public class ResponseAnswer {
 		this.result = result;
 	}
 
-	@XmlElement(name="nextStringWith")
+	@XmlElement(name="nextStartWith")
 	public String getNextStringWith() {
 		return nextStringWith;
 	}

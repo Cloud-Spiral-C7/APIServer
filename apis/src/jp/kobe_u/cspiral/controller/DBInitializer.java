@@ -3,16 +3,18 @@ package jp.kobe_u.cspiral.controller;
 public class DBInitializer {
 
 	public static void main(String args[]){
-		String userId = "5636ffb11d1f2c925c743fa9";
+		String roomId = "5639c99b535e2c92526aa454";
 		String currentWord = "わ";
-
+//
 		DBController controller = new DBController();
+//
+//		controller.initializeAnswers();
+//		controller.setCurrentWord(roomId , currentWord);
 
-		controller.initializeAnswers();
-		controller.setCurrentWord(userId , currentWord);
 
-
-		//		controller.initializeAll();
+		controller.initializeAll();
+//		controller.initializeRooms();
+//		controller.initializeUsers();
 		//controller.getWordNum("562dbad4922caacefbfbc77c");
 //		controller.setStatus("562dbad4922caacefbfbc77c" , DBController.ROOM_STATUS_CREATE);
 //		controller.initializeAnswers();

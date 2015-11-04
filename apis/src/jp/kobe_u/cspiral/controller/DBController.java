@@ -16,6 +16,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 
 public class DBController {
 	private final String USERS_COLLECTION_NAME = "users";
@@ -27,6 +28,9 @@ public class DBController {
 	public static final String ROOM_STATUS_CREATE = "Create";
 	public static final String ROOM_STATUS_PLAYING = "Playing";
 	public static final String ROOM_STATUS_RESULT = "Result";
+
+	public static final String GAME_MODE_TIME = "Time";
+	public static final String GAME_MODE_SCORE = "Score";
 
 	private DBCollection usersCollection;
 	private DBCollection roomsCollection;
@@ -73,12 +77,49 @@ public class DBController {
 
 		return roomId;
 	}
+
+	public void setRoomId(String userId, String roomId){
+		DBObject query = new BasicDBObject();
+		query.put("_id" , new ObjectId(userId));
+		DBObject setOption = new BasicDBObject();
+		setOption.put("roomId", roomId);
+		DBObject set = new BasicDBObject("$set",setOption);
+		roomsCollection.update(query, set);
+	}
 	//-----------------------------------------------------------
 
 	//---------------------roomsコレクション-------------------------
-	public String getGameMode(String userId){
+	public String setRoom(String userId , String name , String gameMode , int wordNum , int limitTime){
+		if(gameMode.equals(GAME_MODE_SCORE)){
+			wordNum = 0;
+		}else if(gameMode.equals(GAME_MODE_TIME)){
+			limitTime = 5;
+		}else{
+			return "Error";
+		}
+
 		DBObject query = new BasicDBObject();
-		query.put("_id", new ObjectId(getRoomId(userId)));
+		query.put("name", name);
+		query.put("gameMode", gameMode);
+		query.put("status", ROOM_STATUS_CREATE);
+		query.put("currentWord", "0");
+		query.put("wordNum",wordNum);
+		query.put("limitTime", limitTime);
+		query.put("userId", userId);
+		roomsCollection.insert(query);
+
+		DBObject result = roomsCollection.findOne(query);
+		ObjectId objectId = (ObjectId)result.get("_id");
+		String roomId = objectId.toString();
+
+		setRoomId(userId, roomId);
+
+		return roomId;
+	}
+
+	public String getGameMode(String roomId){
+		DBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(roomId));
 		DBObject result = roomsCollection.findOne(query);
 		String gameMode = (String)result.get("gameMode");
 		System.out.println("Request to get gameMode,gameMode:" + gameMode);
@@ -86,9 +127,9 @@ public class DBController {
 		return gameMode;
 	}
 
-	public int getWordNum(String userId){
+	public int getWordNum(String roomId){
 		DBObject query = new BasicDBObject();
-		query.put("_id", new ObjectId(getRoomId(userId)));
+		query.put("_id", new ObjectId(roomId));
 		DBObject result = roomsCollection.findOne(query);
 		int wordNum = (Integer)result.get("wordNum");
 		System.out.println("Request to get wordNum,wordNum:" + wordNum);
@@ -96,9 +137,9 @@ public class DBController {
 		return wordNum;
 	}
 
-	public int getAreaId(String userId){
+	public int getAreaId(String roomId){
 		DBObject query = new BasicDBObject();
-		query.put("_id", new ObjectId(getRoomId(userId)));
+		query.put("_id", new ObjectId(roomId));
 		DBObject result = roomsCollection.findOne(query);
 		int areaId = (Integer)result.get("areaId");
 		System.out.println("Request to get areaId,areaId:" + areaId);
@@ -106,18 +147,18 @@ public class DBController {
 		return areaId;
 	}
 
-	public void setStatus(String userId , String value){
+	public void setStatus(String roomId, String value){
 		DBObject query = new BasicDBObject();
-		query.put("_id" , new ObjectId(getRoomId(userId)));
+		query.put("_id" , new ObjectId(roomId));
 		DBObject setOption = new BasicDBObject();
 		setOption.put("status", value);
 		DBObject set = new BasicDBObject("$set",setOption);
 		roomsCollection.update(query, set);
 	}
 
-	public String getCurrentWord(String userId){
+	public String getCurrentWord(String roomId){
 		DBObject query = new BasicDBObject();
-		query.put("_id", new ObjectId(getRoomId(userId)));
+		query.put("_id", new ObjectId(roomId));
 		DBObject result = roomsCollection.findOne(query);
 		String currentWord = (String)result.get("currentWord");
 		System.out.println("Request to get currentWord,currentWord:" + currentWord);
@@ -125,9 +166,9 @@ public class DBController {
 		return currentWord;
 	}
 
-	public void setCurrentWord(String userId , String value){
+	public void setCurrentWord(String roomId, String value){
 		DBObject query = new BasicDBObject();
-		query.put("_id", new ObjectId(getRoomId(userId)));
+		query.put("_id", new ObjectId(roomId));
 		DBObject setOption = new BasicDBObject();
 		setOption.put("currentWord", value);
 		DBObject set = new BasicDBObject("$set",setOption);
@@ -136,37 +177,37 @@ public class DBController {
 	//-----------------------------------------------------------
 
 	//---------------------answersコレクション-------------------------
-	public long getAnswerNum(String userId , String phonetic){
+	public long getAlreadyAnswerNum(String userId , String roomId, String phonetic){
 		DBObject query = new BasicDBObject();
 		query.put("userId", userId);
-		query.put("roomId", getRoomId(userId));
+		query.put("roomId", roomId);
 		query.put("kana", phonetic);
 
 		return answersCollection.count(query);
 	}
 
-	public long getAnswerNum(String userId){
+	public long getAnswerNum(String userId, String roomId){
 		DBObject query = new BasicDBObject();
 		query.put("userId", userId);
-		query.put("roomId", getRoomId(userId));
+		query.put("roomId", roomId);
 
 		return answersCollection.count(query);
 	}
 
-	public void setAnswer(String userId , String locationName , String phonetic){
+	public void setAnswer(String userId , String roomId, String locationName , String phonetic){
 		DBObject query = new BasicDBObject();
 		query.put("placeName", locationName);
 		query.put("kana", phonetic);
 		query.put("userId", userId);
-		query.put("roomId", getRoomId(userId));
+		query.put("roomId", roomId);
 		answersCollection.insert(query);
 	}
 	//-----------------------------------------------------------
 
 	//---------------------areasコレクション-------------------------
-	public String getLatLon(String userId){
+	public String getLatLon(String roomId){
 		DBObject query = new BasicDBObject();
-		query.put("id", getAreaId(userId));
+		query.put("id", getAreaId(roomId));
 		DBObject result = areasCollection.findOne(query);
 		String latLon = ((String)result.get("latLon")).replaceAll(":", ",");
 		System.out.println("Request to get latLon,latLon:" + latLon);
@@ -207,11 +248,15 @@ public class DBController {
 			id.add(tmp.toString());
 		}
 
-		for(int i = 0 ; i < users.size() ; i++){
+		for(int i = 0 ; i < id.size() ; i++){
 			DBObject object = new BasicDBObject("name" , users.get(i).getName())
 										.append("roomId", id.get(i));
 			usersCollection.insert(object);
 		}
+
+		DBObject object = new BasicDBObject("name" , users.get(users.size()-1).getName())
+									.append("roomId", "0");
+		usersCollection.insert(object);
 	}
 
 	public void initializeRooms(){

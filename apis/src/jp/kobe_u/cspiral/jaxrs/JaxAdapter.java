@@ -7,6 +7,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -14,9 +15,11 @@ import javax.ws.rs.core.Response;
 
 import jp.kobe_u.cspiral.controller.DBController;
 import jp.kobe_u.cspiral.entity.QueryAnswer;
+import jp.kobe_u.cspiral.entity.QueryRoom;
 import jp.kobe_u.cspiral.entity.QuerySession;
 import jp.kobe_u.cspiral.entity.ResponseAnswer;
 import jp.kobe_u.cspiral.entity.ResponseInitialValue;
+import jp.kobe_u.cspiral.entity.ResponseRoom;
 import jp.kobe_u.cspiral.entity.ResponseSession;
 
 @Path("/api")
@@ -49,10 +52,17 @@ public class JaxAdapter {
 	 * @param ルーム名、ゲームモード
 	 */
 	@POST
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Consumes({MediaType.APPLICATION_ATOM_XML,MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/rooms")
-	public void setRooms(){
+	public Response setRoom(QueryRoom query){
 
+		ResponseRoom room = new ResponseRoom();
+
+		String roomId = controller.setRoom(query.getUserId() , query.getName(), query.getGameMode() , query.getWordNum() , query.getLimitTime());
+		room.setRoomId(roomId);
+
+		return Response.status(200).entity(room).build();
 	}
 
 	/**
@@ -60,10 +70,11 @@ public class JaxAdapter {
 	 * @return ルーム名、ゲームモードの配列
 	 */
 	@GET
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Consumes({MediaType.APPLICATION_ATOM_XML,MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/rooms")
-	public void getRooms(){
-
+	public Response getRooms(){
+		return Response.status(200).entity("OK").build();
 	}
 
 	/**
@@ -74,19 +85,19 @@ public class JaxAdapter {
 	@GET
 	@Consumes({MediaType.APPLICATION_ATOM_XML,MediaType.APPLICATION_JSON})
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/rooms/initialValue")
-	public Response getInitialValue(@QueryParam("userId") String userId){
+	@Path("/rooms/{id}/initialValue")
+	public Response getInitialValue(@PathParam("id") String roomId){
 
 		ResponseInitialValue value = new ResponseInitialValue();
 
 		String currentWord = generateTheme();
 
-		value.setLatLon(controller.getLatLon(userId));
+		value.setLatLon(controller.getLatLon(roomId));
 		value.setTheme(currentWord);
-		value.setWordNum(controller.getWordNum(userId));
+		value.setWordNum(controller.getWordNum(roomId));
 
-		controller.setStatus(userId , DBController.ROOM_STATUS_PLAYING);
-		controller.setCurrentWord(userId , currentWord);
+		controller.setStatus(roomId , DBController.ROOM_STATUS_PLAYING);
+		controller.setCurrentWord(roomId , currentWord);
 
 		return Response.status(200).entity(value).build();
 
@@ -100,8 +111,8 @@ public class JaxAdapter {
 	@POST
 	@Consumes({MediaType.APPLICATION_ATOM_XML,MediaType.APPLICATION_JSON})
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/rooms/answers")
-	public Response judgeAnswer(QueryAnswer query){
+	@Path("/rooms/{id}/answers")
+	public Response judgeAnswer(@PathParam("id") String roomId, QueryAnswer query){
 
 		ResponseAnswer answer = new ResponseAnswer();
 
@@ -114,18 +125,18 @@ public class JaxAdapter {
 
 		}
 
-		boolean isCurrentWord = checkCurrentWord(query.getUserId(), phonetic);
-		boolean isNewWord = checkNewWord(query.getUserId(), phonetic);
+		boolean isCurrentWord = checkCurrentWord(roomId, phonetic);
+		boolean isNewWord = checkNewWord(query.getUserId(), roomId, phonetic);
 
 		if(isCurrentWord){
 			if(isNewWord){
 				String currentWord = convertSonantMark(phonetic.substring(phonetic.length() - 1));
-				controller.setCurrentWord(query.getUserId(), currentWord);
-				controller.setAnswer(query.getUserId(), locationName , phonetic);
+				controller.setCurrentWord(roomId, currentWord);
+				controller.setAnswer(query.getUserId(),roomId , locationName , phonetic);
 				answer.setNextStringWith(currentWord);
 				answer.setLocationName(locationName);
 				answer.setPhonetic(phonetic);
-				if(checkFinish(query.getUserId())){
+				if(checkFinish(query.getUserId(), roomId)){
 					answer.setResult("Finish");
 				}else{
 					answer.setResult("OK");
@@ -161,11 +172,11 @@ public class JaxAdapter {
 	 * @param ユーザID、解答
 	 * @return boolean
 	 */
-	private boolean checkCurrentWord(String userId, String phonetic){
+	private boolean checkCurrentWord(String roomId, String phonetic){
 
 		String firstChar = phonetic.substring(0,1);
 		firstChar = convertSonantMark(firstChar);
-		String currentWord = controller.getCurrentWord(userId);
+		String currentWord = controller.getCurrentWord(roomId);
 		if(firstChar.equals(currentWord)){
 			return true;
 		}else{
@@ -179,9 +190,9 @@ public class JaxAdapter {
 	 * @param ユーザID、解答
 	 * @return boolean
 	 */
-	private boolean checkNewWord(String userId, String phonetic){
+	private boolean checkNewWord(String userId, String roomId, String phonetic){
 
-		long answerNum = controller.getAnswerNum(userId , phonetic);
+		long answerNum = controller.getAlreadyAnswerNum(userId , roomId, phonetic);
 		if(answerNum == 0){
 			return true;
 		}else{
@@ -195,9 +206,9 @@ public class JaxAdapter {
 	 * @param ユーザID
 	 * @return boolean
 	 */
-	private boolean checkFinish(String userId){
-		long goal = (long)controller.getWordNum(userId);
-		long current = controller.getAnswerNum(userId);
+	private boolean checkFinish(String userId, String roomId){
+		long goal = (long)controller.getWordNum(roomId);
+		long current = controller.getAnswerNum(userId , roomId);
 		if((goal - current) == 0){
 			return true;
 		}else{
