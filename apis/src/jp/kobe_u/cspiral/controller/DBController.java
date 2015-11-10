@@ -131,17 +131,17 @@ public class DBController {
 		DBObject query = new BasicDBObject();
 		query.put("_id", new ObjectId(roomId));
 		DBObject result = roomsCollection.findOne(query);
-		int wordNum = ((Double)result.get("wordNum")).intValue();
+		int wordNum = (Integer)result.get("wordNum");
 		System.out.println("Request to get wordNum,wordNum:" + wordNum);
 
 		return wordNum;
 	}
 
-	public String getAreaId(String roomId){
+	public int getAreaId(String roomId){
 		DBObject query = new BasicDBObject();
 		query.put("_id", new ObjectId(roomId));
 		DBObject result = roomsCollection.findOne(query);
-		String areaId = result.get("areaId").toString();
+		int areaId = (Integer)result.get("areaId");
 		System.out.println("Request to get areaId,areaId:" + areaId);
 
 		return areaId;
@@ -207,7 +207,7 @@ public class DBController {
 	//---------------------areasコレクション-------------------------
 	public String getLatLon(String roomId){
 		DBObject query = new BasicDBObject();
-		query.put("_id", new ObjectId(getAreaId(roomId)));
+		query.put("id", getAreaId(roomId));
 		DBObject result = areasCollection.findOne(query);
 		String latLon = ((String)result.get("latLon")).replaceAll(":", ",");
 		System.out.println("Request to get latLon,latLon:" + latLon);
