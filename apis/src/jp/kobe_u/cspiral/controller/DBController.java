@@ -233,7 +233,7 @@ public class DBController {
 		DBObject query = new BasicDBObject();
 		query.put("gameMode", gameMode);
 		query.put("name", name);
-		query.put("score", score);
+		query.put("score", Double.valueOf(score));
 		rankingCollection.insert(query);
 	}
 
@@ -251,7 +251,7 @@ public class DBController {
 		for(DBObject o: cursor){
 			Ranking rank = new Ranking();
 			rank.setName((String) o.get("name"));
-			rank.setScore((String) o.get("score"));
+			rank.setScore(((Double) o.get("score")).toString());
 //			System.out.println("name:"+rank.getName());
 //			System.out.println("score:"+rank.getScore());
 			ranking.add(rank);
