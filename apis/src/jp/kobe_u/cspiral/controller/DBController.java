@@ -214,15 +214,15 @@ public class DBController {
 	//-----------------------------------------------------------
 
 	//---------------------areasコレクション-------------------------
-	public String getLatLon(String roomId){
-		DBObject query = new BasicDBObject();
-		query.put("id", getAreaId(roomId));
-		DBObject result = areasCollection.findOne(query);
-		String latLon = ((String)result.get("latLon")).replaceAll(":", ",");
-		System.out.println("Request to get latLon,latLon:" + latLon);
-
-		return latLon;
-	}
+//	public String getLatLon(String roomId){
+//		DBObject query = new BasicDBObject();
+//		query.put("id", getAreaId(roomId));
+//		DBObject result = areasCollection.findOne(query);
+//		String latLon = ((String)result.get("latLon")).replaceAll(":", ",");
+//		System.out.println("Request to get latLon,latLon:" + latLon);
+//
+//		return latLon;
+//	}
 	//-----------------------------------------------------------
 
 	//---------------------rankingコレクション-------------------------

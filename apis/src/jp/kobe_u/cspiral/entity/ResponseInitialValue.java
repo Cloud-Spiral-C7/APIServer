@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="initialValue")
 public class ResponseInitialValue {
 
-	private String latLon;
+//	private String latLon;
 	private String theme;
 	private int wordNum;
 
@@ -14,13 +14,13 @@ public class ResponseInitialValue {
 
 	}
 
-	@XmlElement(name="latLon")
-	public String getLatLon() {
-		return latLon;
-	}
-	public void setLatLon(String latLon) {
-		this.latLon = latLon;
-	}
+//	@XmlElement(name="latLon")
+//	public String getLatLon() {
+//		return latLon;
+//	}
+//	public void setLatLon(String latLon) {
+//		this.latLon = latLon;
+//	}
 
 	@XmlElement(name="theme")
 	public String getTheme() {

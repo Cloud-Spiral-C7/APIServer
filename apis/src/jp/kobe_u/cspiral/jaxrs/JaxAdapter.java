@@ -95,7 +95,7 @@ public class JaxAdapter {
 
 		String currentWord = generateTheme();
 
-		value.setLatLon(controller.getLatLon(roomId));
+//		value.setLatLon(controller.getLatLon(roomId));
 		value.setTheme(currentWord);
 		value.setWordNum(controller.getWordNum(roomId));
 
