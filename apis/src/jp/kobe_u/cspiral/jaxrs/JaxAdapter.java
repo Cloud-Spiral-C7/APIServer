@@ -347,12 +347,13 @@ public class JaxAdapter {
 			@QueryParam("userId") String userId
 			,@QueryParam("roomId") String roomId
 			,@QueryParam("resultTime") String resultTime
+			,@QueryParam("rankCount") int rankCount
 			){
 		ResponseRanking response = new ResponseRanking();
 		ArrayList<Ranking> ranking = new ArrayList<Ranking>();
 		controller.setStatus(roomId, "Result");
 		controller.setRanking(controller.getGameMode(roomId) ,  controller.getUserName(userId), resultTime);
-		ranking = controller.getRanking(controller.getGameMode(roomId));
+		ranking = controller.getRanking(controller.getGameMode(roomId), rankCount);
 		response.setUserName(controller.getUserName(userId));
 		response.setRankings(ranking);
 		return response;
