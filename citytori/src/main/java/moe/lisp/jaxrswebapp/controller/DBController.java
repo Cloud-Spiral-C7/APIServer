@@ -6,15 +6,17 @@ import javassist.compiler.ast.NewExpr;
 
 import javax.ejb.Init;
 import javax.json.JsonObject;
+import javax.sound.midi.ControllerEventListener;
 
 import org.bson.types.ObjectId;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 import moe.lisp.jaxrswebapp.entity.Answer;
 import moe.lisp.jaxrswebapp.entity.Area;
 import moe.lisp.jaxrswebapp.entity.Ranking;
+import moe.lisp.jaxrswebapp.entity.ResponseRanking;
 import moe.lisp.jaxrswebapp.entity.Room;
 import moe.lisp.jaxrswebapp.entity.User;
+import moe.lisp.jaxrswebapp.entity.Rank;
 import moe.lisp.jaxrswebapp.util.CSVUtils;
 import moe.lisp.jaxrswebapp.util.DBUtils;
 
@@ -52,24 +54,6 @@ public class DBController {
 	}
 
 	//---------------------usersコレクション-------------------------
-	public String getUserId(String userName){
-		DBObject query = new BasicDBObject();
-		query.put("name", userName);
-		DBObject result = usersCollection.findOne(query);
-		ObjectId id = (ObjectId)result.get("_id");
-		String userId = id.toString();
-
-		return userId;
-
-	}
-
-	public void setUserName(String userName){
-		DBObject query = new BasicDBObject();
-		query.put("name", userName);
-		query.put("roomId" , "0");
-		usersCollection.insert(query);
-	}
-
 	public String getRoomId(String userId){
 		DBObject query = new BasicDBObject();
 		query.put("_id", new ObjectId(userId));
@@ -79,6 +63,18 @@ public class DBController {
 
 		return roomId;
 	}
+
+	public String getUserName(String userId){
+		DBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(userId));
+		DBObject result = usersCollection.findOne(query);
+		String userName = (String)result.get("name");
+		System.out.println("Request to get userId:" + userId +",userName:" + userName);
+
+		return userName;
+	}
+
+
 	//-----------------------------------------------------------
 
 	//---------------------roomsコレクション-------------------------
@@ -189,8 +185,59 @@ public class DBController {
 		query.put("score", score);
 		rankingCollection.insert(query);
 	}
+
+	public ArrayList<Rank> getRanking(String gameMode){
+
+		ArrayList<Rank> ranking = new ArrayList<Rank>();
+
+		DBObject query = new BasicDBObject();
+		query.put("gameMode", gameMode);
+		DBCursor cursor = rankingCollection.find(query);
+		DBObject orderBy = new BasicDBObject();
+		orderBy.put("score",1);
+		cursor.sort(orderBy);
+		cursor.limit(10);
+		for(DBObject o: cursor){
+			Rank rank = new Rank();
+			rank.setName((String) o.get("name"));
+			rank.setScore((String) o.get("score"));
+//			System.out.println("name:"+rank.getName());
+//			System.out.println("score:"+rank.getScore());
+			ranking.add(rank);
+		}
+		for(int i=0;i<ranking.size();i++){
+		System.out.println(ranking.get(i).getName());
+		System.out.println(ranking.get(i).getScore());
+		}
+		return ranking;
+	}
 	//-----------------------------------------------------------
 
+	//-------------------複数コレクション---------------------------
+
+	public Object CloseSingleGame(String userId,String roomId) {
+
+		//roomsコレクションから削除
+		DBObject roomQuery = new BasicDBObject();
+		roomQuery.put("_id",new ObjectId(roomId));
+		DBObject room = roomsCollection.findOne(roomQuery);
+		System.out.println(room);
+		roomsCollection.remove(room);
+
+		//answerコレクションから削除
+		DBCursor answers = answersCollection.find(roomQuery);
+		for(DBObject o : answers){
+			answersCollection.remove(o);
+		}
+
+		//該当userデータのroomIdをnullに変更
+		DBObject userQuery = new BasicDBObject();
+		userQuery.put("_id", new ObjectId(userId));
+		DBObject user = usersCollection.findOne(userQuery);
+		user.put("roomId", null);
+		usersCollection.save(user);
+		return null;
+	}
 	//---------------------Initializer-------------------------
 	public void initializeAll(){
 		initializeRooms();
@@ -283,5 +330,7 @@ public class DBController {
 		}
 	}
 	//-----------------------------------------------------------
+
+
 
 }

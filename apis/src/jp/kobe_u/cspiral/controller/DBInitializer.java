@@ -13,7 +13,8 @@ public class DBInitializer {
 //		controller.setCurrentWord(roomId , currentWord);
 		System.out.println(controller.setRoom(userId, "roomTest", "time", 10, 10));
 
-//		controller.initializeAll();
+
+		controller.initializeAll();
 //		controller.initializeRooms();
 //		controller.initializeUsers();
 		//controller.getWordNum("562dbad4922caacefbfbc77c");

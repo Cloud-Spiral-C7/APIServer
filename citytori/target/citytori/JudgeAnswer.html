@@ -10,7 +10,7 @@
       var kana = encodeURIComponent(document.forms["answerForm"].elements["phonetic"].value);
       var data = { userId: id , locationName:name , phonetic:kana};
       var xhr = new XMLHttpRequest();
-      xhr.open('POST','./api/JudgeAnswer');
+      xhr.open('POST','./rest/JudgeAnswer');
       xhr.onreadystatechange = processResponse;
       xhr.setRequestHeader('Content-Type','application/json');
       var json_data = JSON.stringify(data);

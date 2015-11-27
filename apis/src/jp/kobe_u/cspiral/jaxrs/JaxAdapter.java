@@ -1,6 +1,7 @@
 package jp.kobe_u.cspiral.jaxrs;
 
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.ws.rs.Consumes;
@@ -17,8 +18,10 @@ import jp.kobe_u.cspiral.controller.DBController;
 import jp.kobe_u.cspiral.entity.QueryAnswer;
 import jp.kobe_u.cspiral.entity.QueryRoom;
 import jp.kobe_u.cspiral.entity.QuerySession;
+import jp.kobe_u.cspiral.entity.Ranking;
 import jp.kobe_u.cspiral.entity.ResponseAnswer;
 import jp.kobe_u.cspiral.entity.ResponseInitialValue;
+import jp.kobe_u.cspiral.entity.ResponseRanking;
 import jp.kobe_u.cspiral.entity.ResponseRoom;
 import jp.kobe_u.cspiral.entity.ResponseSession;
 
@@ -275,7 +278,54 @@ public class JaxAdapter {
 		return convertedWord;
 	}
 
+	/**
+	 * ランキングとユーザ名を取得
+	 * @param userId ユーザID
+	 * @param roomId ルームID
+	 * @param score スコア(Integer型)
+	 *
+	 * @return ranking ResponseRanking型
+	 * 		例:{
+			“userName” : ”hogehoge”,
+			“ranking” : [
+			{“name” : ”hoge” , ”score” : 198},
+			{“name” : ”foo” , ”score” : 199},
+			{“name” : ”bar” , ”score” : 200}
+						]
+				}
+	 */
 
+	@Path("/ranks")
+	@GET
+	@Produces({MediaType.APPLICATION_JSON})
+	public ResponseRanking UpdateTimeAttackRankingSource(
+			@QueryParam("userId") String userId
+			,@QueryParam("roomId") String roomId
+			,@QueryParam("resultTime") String resultTime
+			){
+		ResponseRanking response = new ResponseRanking();
+		ArrayList<Ranking> ranking = new ArrayList<Ranking>();
+		controller.setStatus(roomId, "Result");
+		controller.setRanking(controller.getGameMode(roomId) ,  controller.getUserName(userId), resultTime);
+		ranking = controller.getRanking(controller.getGameMode(roomId));
+		response.setUserName(controller.getUserName(userId));
+		response.setRankings(ranking);
+		return response;
+	}
+	/**
+	 * 一人用タイムアタックを終了
+	 * @param userId ユーザID(Cookieと関連付けられている)
+	 *
+	 */
+
+	@GET
+	@Path("/rooms/{id}/close")
+	@Produces({MediaType.APPLICATION_JSON})
+	public Response CloseSingleGame(@PathParam("id") final String roomId){
+		//一応値は返すが、何にも使われない
+		controller.CloseSingleGame(roomId);
+		return Response.status(200).entity("").build();
+	}
 
 
 //	// simple counter

@@ -9,7 +9,6 @@ import jp.kobe_u.cspiral.entity.Room;
 import jp.kobe_u.cspiral.entity.User;
 import jp.kobe_u.cspiral.util.CSVUtils;
 import jp.kobe_u.cspiral.util.DBUtils;
-
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
@@ -66,6 +65,16 @@ public class DBController {
 		query.put("name", userName);
 		query.put("roomId" , "0");
 		usersCollection.insert(query);
+	}
+
+	public String getUserName(String userId){
+		DBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(userId));
+		DBObject result = usersCollection.findOne(query);
+		String name = (String)result.get("name");
+		System.out.println("Request to get name,userId:" + userId +",name:" + name);
+
+		return name;
 	}
 
 	public String getRoomId(String userId){
@@ -221,11 +230,60 @@ public class DBController {
 		DBObject query = new BasicDBObject();
 		query.put("gameMode", gameMode);
 		query.put("name", name);
-		query.put("score", score);
+		query.put("score", Double.valueOf(score));
 		rankingCollection.insert(query);
 	}
-	//-----------------------------------------------------------
 
+	public ArrayList<Ranking> getRanking(String gameMode){
+
+		ArrayList<Ranking> ranking = new ArrayList<Ranking>();
+
+		DBObject query = new BasicDBObject();
+		query.put("gameMode", gameMode);
+		DBCursor cursor = rankingCollection.find(query);
+		DBObject orderBy = new BasicDBObject();
+		orderBy.put("score",1);
+		cursor.sort(orderBy);
+		cursor.limit(10);
+		for(DBObject o: cursor){
+			Ranking rank = new Ranking();
+			rank.setName((String) o.get("name"));
+			rank.setScore(((Double) o.get("score")).toString());
+//			System.out.println("name:"+rank.getName());
+//			System.out.println("score:"+rank.getScore());
+			ranking.add(rank);
+		}
+		for(int i=0;i<ranking.size();i++){
+		System.out.println(ranking.get(i).getName());
+		System.out.println(ranking.get(i).getScore());
+		}
+		return ranking;
+	}
+	//-----------------------------------------------------------
+	//-------------------複数コレクション---------------------------
+
+	public Object CloseSingleGame(String roomId) {
+		//roomsコレクションから削除
+		DBObject roomQuery = new BasicDBObject();
+		roomQuery.put("_id",new ObjectId(roomId));
+		DBObject room = roomsCollection.findOne(roomQuery);
+		System.out.println(room);
+		roomsCollection.remove(room);
+
+		//answerコレクションから削除
+		DBCursor answers = answersCollection.find(roomQuery);
+		for(DBObject o : answers){
+			answersCollection.remove(o);
+		}
+
+		//該当userデータのroomIdをnullに変更
+		DBObject userQuery = new BasicDBObject();
+		userQuery.put("roomId",roomId);
+		DBObject user = usersCollection.findOne(userQuery);
+		user.put("roomId", null);
+		usersCollection.save(user);
+		return null;
+	}
 	//---------------------Initializer-------------------------
 	public void initializeAll(){
 		initializeRooms();

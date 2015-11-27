@@ -1,11 +1,15 @@
 package jp.kobe_u.cspiral.entity;
 
 import java.util.ArrayList;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement(name="rank")
 public class ResponseRanking {
 	private String userName;
-	private ArrayList<Rank> ranking;
+	private ArrayList<Ranking> ranking;
 
+	@XmlElement(name="userName")
 	public String getUserName() {
 		return userName;
 	}
@@ -14,12 +18,13 @@ public class ResponseRanking {
 		this.userName = userName;
 	}
 
-	public ArrayList<Rank> getRankings() {
+	@XmlElement(name="ranking")
+	public ArrayList<Ranking> getRankings() {
 		return ranking;
 	}
 
-	public void setRankings(ArrayList<Rank> rankings) {
-		this.ranking = rankings;
+	public void setRankings(ArrayList<Ranking> ranking2) {
+		this.ranking = ranking2;
 	}
 
 

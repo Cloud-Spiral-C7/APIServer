@@ -5,10 +5,21 @@ public class DBInitializer {
 	public static void main(String args[]){
 		DBController controller = new DBController();
 		controller.initializeAll();
+<<<<<<< HEAD
 		//controller.getWordNum("562dbad4922caacefbfbc77c");
 //		controller.setStatus("562dbad4922caacefbfbc77c" , DBController.ROOM_STATUS_CREATE);
 //		controller.initializeAnswers();
 //		controller.setCurrentWord("56305fb8922c1e1f04c9ca10" , "わ");
+=======
+//		controller.setRanking(controller.getGameMode("5633128d4de93496d452bf61") ,  controller.getUserName("5633128d4de93496d452bf61"), "1");
+//		controller.getRanking(controller.getGameMode("5633128d4de93496d452bf61"));
+//		controller.CloseSingleGame("56360cbe4de935b29b214f24", controller.getRoomId("56360cbe4de935b29b214f24"));
+
+		//controller.getWordNum("562dbad4922caacefbfbc77c");
+//		controller.setStatus("562dbad4922caacefbfbc77c" , DBController.ROOM_STATUS_CREATE);
+		//controller.initializeAnswers();
+		//controller.setCurrentWord("56305fb8922c1e1f04c9ca10" , "わ");
+>>>>>>> 81072dbd6452af3807996cfdeb3b7f1941444038
 
 
 //		String phonetic = "さっぽろ";

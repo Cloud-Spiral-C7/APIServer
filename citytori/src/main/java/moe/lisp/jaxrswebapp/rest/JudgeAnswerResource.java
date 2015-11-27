@@ -50,7 +50,6 @@ public class JudgeAnswerResource {
 				judgement.setJudgeFlag("NG:New");
 			}
 		}else{
-
 			judgement.setJudgeFlag("NG:Current");
 		}
 
