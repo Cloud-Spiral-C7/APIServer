@@ -31,6 +31,28 @@ public class JaxAdapter {
 	DBController controller = new DBController();
 
 
+	@GET
+	@Consumes({MediaType.APPLICATION_ATOM_XML,MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	@Path("/initializeDB")
+	public Response initDB(@QueryParam("pass") String pass){
+
+		String status = "";
+
+		if(pass.equals("spiralc7") || pass.equals("345")){
+			controller.initializeAllDrop();
+
+			if(pass.equals("345")){
+				status += "345 is my favorite member in HKT48\n";
+			}
+			status += "Initilize DB : OK";
+		}else{
+			status += "Initilize DB : NG\nYou are not admin";
+		}
+
+		return Response.status(200).entity(status).build();
+	}
+
 	/**
 	 * ユーザIDを返す
 	 * @param 任意のユーザ名

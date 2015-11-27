@@ -6,15 +6,6 @@ public class DBInitializer {
 		String roomId = "5639c99b535e2c92526aa454";
 		String userId = "564c4e282bbf2bb7727edb2b";
 		String currentWord = "わ";
-
-		String phonetic = "そん";
-		String endChar = phonetic.substring(phonetic.length() - 1);
-		if(endChar.equals("ん")){
-			System.err.println("NG");
-		}else{
-			System.out.println("OK");
-		}
-
 //
 		DBController controller = new DBController();
 //
@@ -22,11 +13,11 @@ public class DBInitializer {
 //		controller.setCurrentWord(roomId , currentWord);
 //		System.out.println(controller.setRoom(userId, "roomTest", "time", 10, 10));
 
-//		if(controller.setUserName("テスト")){
-//			System.out.println("OK");
-//		}else{
-//			System.err.println("NG");
-//		}
+		if(controller.setUserName("たくや")){
+			System.out.println("OK");
+		}else{
+			System.err.println("NG");
+		}
 //		controller.initializeAll();
 //		controller.initializeRooms();
 //		controller.initializeUsers();

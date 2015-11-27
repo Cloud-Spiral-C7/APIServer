@@ -299,6 +299,13 @@ public class DBController {
 		initializeAreas();
 	}
 
+	public void initializeAllDrop(){
+		usersCollection.drop();
+		roomsCollection.drop();
+		answersCollection.drop();
+		areasCollection.drop();
+	}
+
 	public void initializeUsers(){
 		usersCollection.drop();
 
