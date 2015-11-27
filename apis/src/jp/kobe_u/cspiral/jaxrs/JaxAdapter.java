@@ -133,21 +133,22 @@ public class JaxAdapter {
 
 		}
 
-		boolean isCurrentWord = checkCurrentWord(roomId, phonetic);
-		boolean isNewWord = checkNewWord(query.getUserId(), roomId, phonetic);
-
-		if(isCurrentWord){
-			if(isNewWord){
-				String currentWord = convertSonantMark(phonetic.substring(phonetic.length() - 1));
-				controller.setCurrentWord(roomId, currentWord);
-				controller.setAnswer(query.getUserId(),roomId , locationName , phonetic);
-				answer.setNextStringWith(currentWord);
-				answer.setLocationName(locationName);
-				answer.setPhonetic(phonetic);
-				if(checkFinish(query.getUserId(), roomId)){
-					answer.setResult("Finish");
+		if(checkCurrentWord(roomId, phonetic)){
+			if(checkNewWord(query.getUserId(), roomId, phonetic)){
+				if(!checkEndWord(phonetic)){
+					String currentWord = convertSonantMark(phonetic.substring(phonetic.length() - 1));
+					controller.setCurrentWord(roomId, currentWord);
+					controller.setAnswer(query.getUserId(),roomId , locationName , phonetic);
+					answer.setNextStringWith(currentWord);
+					answer.setLocationName(locationName);
+					answer.setPhonetic(phonetic);
+					if(checkFinish(query.getUserId(), roomId)){
+						answer.setResult("Finish");
+					}else{
+						answer.setResult("OK");
+					}
 				}else{
-					answer.setResult("OK");
+					answer.setResult("NG:EndWord");
 				}
 			}else{
 				answer.setResult("NG:New");
@@ -202,6 +203,23 @@ public class JaxAdapter {
 
 		long answerNum = controller.getAlreadyAnswerNum(userId , roomId, phonetic);
 		if(answerNum == 0){
+			return true;
+		}else{
+			return false;
+		}
+
+	}
+
+
+	/**
+	 * 最後が「ん」であるか確認する
+	 * @param 解答
+	 * @return boolean
+	 */
+	private boolean checkEndWord(String phonetic){
+
+		String endChar = phonetic.substring(phonetic.length() - 1);
+		if(endChar.equals("ん")){
 			return true;
 		}else{
 			return false;
