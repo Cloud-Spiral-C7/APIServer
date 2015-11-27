@@ -31,6 +31,28 @@ public class JaxAdapter {
 	DBController controller = new DBController();
 
 
+	@GET
+	@Consumes({MediaType.APPLICATION_ATOM_XML,MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	@Path("/initializeDB")
+	public Response initDB(@QueryParam("pass") String pass){
+
+		String status = "";
+
+		if(pass.equals("spiralc7") || pass.equals("345")){
+			controller.initializeAllDrop();
+
+			if(pass.equals("345")){
+				status += "345 is my favorite member in HKT48\n";
+			}
+			status += "Initilize DB : OK";
+		}else{
+			status += "Initilize DB : NG\nYou are not admin";
+		}
+
+		return Response.status(200).entity(status).build();
+	}
+
 	/**
 	 * ユーザIDを返す
 	 * @param 任意のユーザ名
@@ -44,8 +66,13 @@ public class JaxAdapter {
 
 		ResponseSession session = new ResponseSession();
 
-		controller.setUserName(query.getUserName());
-		session.setUserId(controller.getUserId(query.getUserName()));
+		if(controller.setUserName(query.getUserName())){
+			session.setUserId(controller.getUserId(query.getUserName()));
+			session.setStatus("OK");
+		}else{
+			session.setStatus("Already");
+			session.setUserId("");
+		}
 
 		return Response.status(200).entity(session).build();
 	}
@@ -95,7 +122,7 @@ public class JaxAdapter {
 
 		String currentWord = generateTheme();
 
-		value.setLatLon(controller.getLatLon(roomId));
+//		value.setLatLon(controller.getLatLon(roomId));
 		value.setTheme(currentWord);
 		value.setWordNum(controller.getWordNum(roomId));
 
@@ -128,21 +155,22 @@ public class JaxAdapter {
 
 		}
 
-		boolean isCurrentWord = checkCurrentWord(roomId, phonetic);
-		boolean isNewWord = checkNewWord(query.getUserId(), roomId, phonetic);
-
-		if(isCurrentWord){
-			if(isNewWord){
-				String currentWord = convertSonantMark(phonetic.substring(phonetic.length() - 1));
-				controller.setCurrentWord(roomId, currentWord);
-				controller.setAnswer(query.getUserId(),roomId , locationName , phonetic);
-				answer.setNextStringWith(currentWord);
-				answer.setLocationName(locationName);
-				answer.setPhonetic(phonetic);
-				if(checkFinish(query.getUserId(), roomId)){
-					answer.setResult("Finish");
+		if(checkCurrentWord(roomId, phonetic)){
+			if(checkNewWord(query.getUserId(), roomId, phonetic)){
+				if(!checkEndWord(phonetic)){
+					String currentWord = convertSonantMark(phonetic.substring(phonetic.length() - 1));
+					controller.setCurrentWord(roomId, currentWord);
+					controller.setAnswer(query.getUserId(),roomId , locationName , phonetic);
+					answer.setNextStringWith(currentWord);
+					answer.setLocationName(locationName);
+					answer.setPhonetic(phonetic);
+					if(checkFinish(query.getUserId(), roomId)){
+						answer.setResult("Finish");
+					}else{
+						answer.setResult("OK");
+					}
 				}else{
-					answer.setResult("OK");
+					answer.setResult("NG:EndWord");
 				}
 			}else{
 				answer.setResult("NG:New");
@@ -197,6 +225,23 @@ public class JaxAdapter {
 
 		long answerNum = controller.getAlreadyAnswerNum(userId , roomId, phonetic);
 		if(answerNum == 0){
+			return true;
+		}else{
+			return false;
+		}
+
+	}
+
+
+	/**
+	 * 最後が「ん」であるか確認する
+	 * @param 解答
+	 * @return boolean
+	 */
+	private boolean checkEndWord(String phonetic){
+
+		String endChar = phonetic.substring(phonetic.length() - 1);
+		if(endChar.equals("ん")){
 			return true;
 		}else{
 			return false;
@@ -302,12 +347,13 @@ public class JaxAdapter {
 			@QueryParam("userId") String userId
 			,@QueryParam("roomId") String roomId
 			,@QueryParam("resultTime") String resultTime
+			,@QueryParam("rankCount") int rankCount
 			){
 		ResponseRanking response = new ResponseRanking();
 		ArrayList<Ranking> ranking = new ArrayList<Ranking>();
 		controller.setStatus(roomId, "Result");
 		controller.setRanking(controller.getGameMode(roomId) ,  controller.getUserName(userId), resultTime);
-		ranking = controller.getRanking(controller.getGameMode(roomId));
+		ranking = controller.getRanking(controller.getGameMode(roomId), rankCount);
 		response.setUserName(controller.getUserName(userId));
 		response.setRankings(ranking);
 		return response;

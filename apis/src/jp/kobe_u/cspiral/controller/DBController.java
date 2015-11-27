@@ -9,9 +9,6 @@ import jp.kobe_u.cspiral.entity.Room;
 import jp.kobe_u.cspiral.entity.User;
 import jp.kobe_u.cspiral.util.CSVUtils;
 import jp.kobe_u.cspiral.util.DBUtils;
-//import moe.lisp.jaxrswebapp.entity.Rank;
-
-
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
@@ -63,11 +60,18 @@ public class DBController {
 
 	}
 
-	public void setUserName(String userName){
+	public boolean setUserName(String userName){
 		DBObject query = new BasicDBObject();
 		query.put("name", userName);
-		query.put("roomId" , "0");
-		usersCollection.insert(query);
+
+		if(usersCollection.find(query).count() == 0){
+			query.put("roomId" , "0");
+			usersCollection.insert(query);
+			return true;
+		}
+
+		return false;
+
 	}
 
 	public String getUserName(String userId){
@@ -217,15 +221,15 @@ public class DBController {
 	//-----------------------------------------------------------
 
 	//---------------------areasコレクション-------------------------
-	public String getLatLon(String roomId){
-		DBObject query = new BasicDBObject();
-		query.put("id", getAreaId(roomId));
-		DBObject result = areasCollection.findOne(query);
-		String latLon = ((String)result.get("latLon")).replaceAll(":", ",");
-		System.out.println("Request to get latLon,latLon:" + latLon);
-
-		return latLon;
-	}
+//	public String getLatLon(String roomId){
+//		DBObject query = new BasicDBObject();
+//		query.put("id", getAreaId(roomId));
+//		DBObject result = areasCollection.findOne(query);
+//		String latLon = ((String)result.get("latLon")).replaceAll(":", ",");
+//		System.out.println("Request to get latLon,latLon:" + latLon);
+//
+//		return latLon;
+//	}
 	//-----------------------------------------------------------
 
 	//---------------------rankingコレクション-------------------------
@@ -237,7 +241,7 @@ public class DBController {
 		rankingCollection.insert(query);
 	}
 
-	public ArrayList<Ranking> getRanking(String gameMode){
+	public ArrayList<Ranking> getRanking(String gameMode, int rankCount){
 
 		ArrayList<Ranking> ranking = new ArrayList<Ranking>();
 
@@ -247,7 +251,7 @@ public class DBController {
 		DBObject orderBy = new BasicDBObject();
 		orderBy.put("score",1);
 		cursor.sort(orderBy);
-		cursor.limit(10);
+		cursor.limit(rankCount);
 		for(DBObject o: cursor){
 			Ranking rank = new Ranking();
 			rank.setName((String) o.get("name"));
@@ -293,6 +297,13 @@ public class DBController {
 		initializeUsers();
 		initializeAnswers();
 		initializeAreas();
+	}
+
+	public void initializeAllDrop(){
+		usersCollection.drop();
+		roomsCollection.drop();
+		answersCollection.drop();
+		areasCollection.drop();
 	}
 
 	public void initializeUsers(){
