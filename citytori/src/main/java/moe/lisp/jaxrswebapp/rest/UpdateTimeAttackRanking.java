@@ -38,12 +38,13 @@ public class UpdateTimeAttackRanking {
 	public ResponseRanking UpdateTimeAttackRankingSource(
 			@QueryParam("userId") String userId
 			,@QueryParam("resultTime") String resultTime
+			,@QueryParam("rankCount") int rankCount
 			){
 		ResponseRanking response = new ResponseRanking();
 		ArrayList<Rank> ranking = new ArrayList<Rank>();
 		controller.setStatus(userId, "Result");
 		controller.setRanking(controller.getGameMode(userId) ,  controller.getUserName(userId), resultTime);
-		ranking = controller.getRanking(controller.getGameMode(userId));
+		ranking = controller.getRanking(controller.getGameMode(userId),rankCount);
 		response.setUserName(controller.getUserName(userId));
 		response.setRankings(ranking);
 		return response;
