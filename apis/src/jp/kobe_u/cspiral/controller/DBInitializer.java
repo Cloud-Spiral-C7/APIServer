@@ -11,10 +11,14 @@ public class DBInitializer {
 //
 //		controller.initializeAnswers();
 //		controller.setCurrentWord(roomId , currentWord);
-		System.out.println(controller.setRoom(userId, "roomTest", "time", 10, 10));
+//		System.out.println(controller.setRoom(userId, "roomTest", "time", 10, 10));
 
-
-		controller.initializeAll();
+		if(controller.setUserName("テスト")){
+			System.out.println("OK");
+		}else{
+			System.err.println("NG");
+		}
+//		controller.initializeAll();
 //		controller.initializeRooms();
 //		controller.initializeUsers();
 		//controller.getWordNum("562dbad4922caacefbfbc77c");

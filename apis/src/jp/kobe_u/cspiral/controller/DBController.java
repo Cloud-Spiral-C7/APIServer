@@ -60,11 +60,18 @@ public class DBController {
 
 	}
 
-	public void setUserName(String userName){
+	public boolean setUserName(String userName){
 		DBObject query = new BasicDBObject();
 		query.put("name", userName);
-		query.put("roomId" , "0");
-		usersCollection.insert(query);
+
+		if(usersCollection.find(query).count() == 0){
+			query.put("roomId" , "0");
+			usersCollection.insert(query);
+			return true;
+		}
+
+		return false;
+
 	}
 
 	public String getUserName(String userId){

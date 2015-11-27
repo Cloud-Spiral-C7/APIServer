@@ -44,8 +44,13 @@ public class JaxAdapter {
 
 		ResponseSession session = new ResponseSession();
 
-		controller.setUserName(query.getUserName());
-		session.setUserId(controller.getUserId(query.getUserName()));
+		if(controller.setUserName(query.getUserName())){
+			session.setUserId(controller.getUserId(query.getUserName()));
+			session.setStatus("OK");
+		}else{
+			session.setStatus("Already");
+			session.setUserId("");
+		}
 
 		return Response.status(200).entity(session).build();
 	}
