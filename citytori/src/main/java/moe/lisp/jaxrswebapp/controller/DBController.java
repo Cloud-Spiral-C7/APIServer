@@ -186,7 +186,7 @@ public class DBController {
 		rankingCollection.insert(query);
 	}
 
-	public ArrayList<Rank> getRanking(String gameMode){
+	public ArrayList<Rank> getRanking(String gameMode,  int rankCount){
 
 		ArrayList<Rank> ranking = new ArrayList<Rank>();
 
@@ -196,7 +196,7 @@ public class DBController {
 		DBObject orderBy = new BasicDBObject();
 		orderBy.put("score",1);
 		cursor.sort(orderBy);
-		cursor.limit(10);
+		cursor.limit(rankCount);
 		for(DBObject o: cursor){
 			Rank rank = new Rank();
 			rank.setName((String) o.get("name"));
