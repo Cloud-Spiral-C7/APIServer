@@ -4,15 +4,16 @@ public class DBInitializer {
 
 	public static void main(String args[]){
 		String roomId = "5639c99b535e2c92526aa454";
+		String userId = "564c4e282bbf2bb7727edb2b";
 		String currentWord = "わ";
 //
 		DBController controller = new DBController();
 //
 //		controller.initializeAnswers();
 //		controller.setCurrentWord(roomId , currentWord);
+		System.out.println(controller.setRoom(userId, "roomTest", "time", 10, 10));
 
-
-		controller.initializeAll();
+//		controller.initializeAll();
 //		controller.initializeRooms();
 //		controller.initializeUsers();
 		//controller.getWordNum("562dbad4922caacefbfbc77c");
